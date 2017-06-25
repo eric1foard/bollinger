@@ -8,6 +8,12 @@ def get_data(symbol):
     df = df.rename(columns={'Close': symbol})
     return df
 
+def daily_returns_portfolio(df):
+    daily_returns = df.copy()
+    daily_returns[1:] = (df[1:] / df[:-1].values) - 1
+    daily_returns.ix[0, :] = 0 # set daily returns for row 0 to 0
+    return daily_returns
+
 def portfolio_value():
     dates = pd.date_range('2016-06-23', '2017-06-23')
     df = pd.DataFrame(index=dates)
@@ -24,8 +30,14 @@ def portfolio_value():
     allocated = normalized * [0.5, 0.5] # multiply by allocation
     pos_vals = allocated * initial_port_val # multiply by intial portfolio value
     port_val = pos_vals.sum(axis=1) # get value for each day
-    port_val.plot()
+    return port_val
+
+def main():
+    df = portfolio_value()
+    daily_returns = daily_returns_portfolio(pd.DataFrame(df, columns=['Value']))
+    print daily_returns
+    daily_returns.plot()
     plt.show()
 
 if __name__ == '__main__':
-    portfolio_value()
+    main()
